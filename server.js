@@ -8,10 +8,12 @@ const userRoutes = require('./routes/userRoutes');
 const LabRoutes = require("./routes/labRoutes");
 const AgentRoutes = require("./routes/AgentRoutes");
 const Agent=require("./models/Agent")
+const cors=require("cors");
 dotenv.config();
 connectDB();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use('/api', userRoutes);
 app.use("/agent", AgentRoutes);

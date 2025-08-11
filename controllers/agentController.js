@@ -1,6 +1,7 @@
 const Agent = require('../models/Agent');
 
 exports.registerAgent = async (req, res) => {
+  console.log("😍😍😍😍😍😍😍😍😎😎😎",req.body);
   try {
     const { deviceId, labId, hostname, ip } = req.body;
 
@@ -24,6 +25,7 @@ exports.registerAgent = async (req, res) => {
 };
 
 exports.getAgentsByLab = async (req, res) => {
+  console.log("😍😍😍😎😎",req.params)
   try {
     const { labId } = req.params;
     const agents = await Agent.find({ lab: labId });

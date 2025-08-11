@@ -8,6 +8,8 @@ const userRoutes = require('./routes/userRoutes');
 const LabRoutes = require("./routes/labRoutes");
 const AgentRoutes = require("./routes/AgentRoutes");
 const Agent=require("./models/Agent")
+const examRoutes = require("./routes/ExamRoutes");
+
 const cors=require("cors");
 dotenv.config();
 connectDB();
@@ -18,6 +20,7 @@ app.use(express.json());
 app.use('/api', userRoutes);
 app.use("/agent", AgentRoutes);
 app.use("/lab", LabRoutes);
+app.use("/exams", examRoutes);
 
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);

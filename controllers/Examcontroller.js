@@ -1,5 +1,5 @@
 const Exam = require("../models/Exammodel");
-
+const { sendCommandToLab } = require("../Services/Agentservice")
 exports.createExam = async (req, res) => {
   try {
     const { name, url, status, autoMode, autoOnTime, autoOffTime, labId } = req.body;
@@ -54,18 +54,24 @@ exports.getExamById = async (req, res) => {
   }
 };
 
-// Update an exam by ID
 exports.updateExam = async (req, res) => {
   try {
-    const updatedExam = await Exam.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const examBeforeUpdate = await Exam.findById(req.params.id);
+    if (!examBeforeUpdate) return res.status(404).json({ error: "Exam not found" });
 
-    if (!updatedExam) {
-      return res.status(404).json({ error: "Exam not found" });
+    const updatedExam = await Exam.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    // If status changed, notify agents
+    if (req.body.status && req.body.status !== examBeforeUpdate.status) {
+      const labId = updatedExam.labId.toString();
+      if (req.body.status === "Running" || req.body.status === "Started") {
+        sendCommandToLab(labId, { type: "START_EXAM", url: updatedExam.url });
+      } else if (req.body.status === "Stopped") {
+        // Send STOP_EXAM command to all agents in this lab
+        sendCommandToLab(labId, { type: "STOP_EXAM" });
+      }
     }
+
     res.json(updatedExam);
   } catch (error) {
     res.status(500).json({ error: error.message });

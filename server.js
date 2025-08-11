@@ -9,7 +9,8 @@ const LabRoutes = require("./routes/labRoutes");
 const AgentRoutes = require("./routes/AgentRoutes");
 const Agent=require("./models/Agent")
 const examRoutes = require("./routes/ExamRoutes");
-
+const {setAgentsByLabMap}=require("./Services/Agentservice")
+require("./cron/Autostartjob")
 const cors=require("cors");
 dotenv.config();
 connectDB();
@@ -28,7 +29,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server, path: '/ws' });
 
 const agentsByLab = {};
-
+setAgentsByLabMap(agentsByLab);
 wss.on('connection', (ws) => {
   console.log('Agent connected');
 
@@ -84,13 +85,6 @@ wss.on('connection', (ws) => {
 });
 
 
-function sendCommandToLab(labId, command) {
-    if (agentsByLab[labId]) {
-        agentsByLab[labId].forEach(agent => {
-            agent.ws.send(JSON.stringify(command));
-        });
-    }
-}
 
 app.post('/start-exam/:labId/:deviceId', (req, res) => {
   const { labId, deviceId } = req.params;
@@ -107,19 +101,19 @@ app.post('/start-exam/:labId/:deviceId', (req, res) => {
     return res.status(404).json({ success: false, message: 'Agent not connected' });
   }
 });
-app.post('/stop-exam/:labId/:deviceId', (req, res) => {
-  const { labId, deviceId } = req.params;
+// app.post('/stop-exam/:labId/:deviceId', (req, res) => {
+//   const { labId, deviceId } = req.params;
 
-  if (
-    agentsByLab[labId] &&
-    agentsByLab[labId][deviceId] &&
-    agentsByLab[labId][deviceId].readyState === WebSocket.OPEN
-  ) {
-    agentsByLab[labId][deviceId].send(JSON.stringify({ type: 'STOP_EXAM' }));
-    return res.json({ success: true, message: `Stopped exam on device ${deviceId}` });
-  } else {
-    return res.status(404).json({ success: false, message: 'Agent not connected' });
-  }
-});
+//   if (
+//     agentsByLab[labId] &&
+//     agentsByLab[labId][deviceId] &&
+//     agentsByLab[labId][deviceId].readyState === WebSocket.OPEN
+//   ) {
+//     agentsByLab[labId][deviceId].send(JSON.stringify({ type: 'STOP_EXAM' }));
+//     return res.json({ success: true, message: `Stopped exam on device ${deviceId}` });
+//   } else {
+//     return res.status(404).json({ success: false, message: 'Agent not connected' });
+//   }
+// });
 
 -server.listen(PORT, () => console.log(`Server running with WS on port ${PORT}`));

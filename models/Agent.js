@@ -7,6 +7,7 @@ const agentSchema = new mongoose.Schema({
   ip: { type: String },
   status: { type: String, enum: ['online', 'offline', 'locked'], default: 'offline' },
   lastSeen: { type: Date, default: Date.now },
+  
 }, { timestamps: true });
 
 module.exports = mongoose.model('Agent', agentSchema);

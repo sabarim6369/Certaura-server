@@ -61,13 +61,11 @@ exports.updateExam = async (req, res) => {
 
     const updatedExam = await Exam.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
-    // If status changed, notify agents
     if (req.body.status && req.body.status !== examBeforeUpdate.status) {
       const labId = updatedExam.labId.toString();
       if (req.body.status === "Running" || req.body.status === "Started") {
         sendCommandToLab(labId, { type: "START_EXAM", url: updatedExam.url });
       } else if (req.body.status === "Stopped") {
-        // Send STOP_EXAM command to all agents in this lab
         sendCommandToLab(labId, { type: "STOP_EXAM" });
       }
     }

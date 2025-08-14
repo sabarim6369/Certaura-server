@@ -32,7 +32,6 @@ const agentsByLab = {};
 setAgentsByLabMap(agentsByLab);
 wss.on('connection', (ws) => {
   console.log('Agent connected');
-
   ws.on('message', async (message) => {
     try {
       const data = JSON.parse(message);
@@ -69,7 +68,6 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     console.log('Agent disconnected');
-    // Remove from agentsByLab:
     for (const labId in agentsByLab) {
       for (const deviceId in agentsByLab[labId]) {
         if (agentsByLab[labId][deviceId] === ws) {

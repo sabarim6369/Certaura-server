@@ -1,4 +1,5 @@
 const Agent = require('../models/Agent');
+const { sendCommandToLab,sendCommandToAgent } = require("../Services/Agentservice")
 
 exports.registerAgent = async (req, res) => {
   console.log("😍😍😍😍😍😍😍😍😎😎😎",req.body);
@@ -34,3 +35,48 @@ exports.getAgentsByLab = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+exports.restartAgent = async (req, res) => {
+  try {
+    const { labId, deviceId } = req.body;
+
+    if (!labId || !deviceId) {
+      return res.status(400).json({ error: "labId and deviceId are required" });
+    }
+
+    // Send RESTART command to the specific agent
+    sendCommandToAgent(labId, deviceId, { type: "RESTART_EXAM" });
+
+    res.json({ message: `Restart command sent to agent ${deviceId} in lab ${labId}` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+exports.startingsingleagent=async(req,res)=>{
+    console.log("😍😍😍😍😍😍😍😍",req.body)
+    
+
+  try{
+ const { labId, deviceId,Examurl } = req.body;
+console.log(Examurl)
+    if (!labId || !deviceId) {
+      return res.status(400).json({ error: "labId and deviceId are required" });
+    }
+        sendCommandToAgent(labId, deviceId,{ type: "RESTART_EXAM", url: Examurl });
+
+
+    res.json({ message: `Restart command sent to agent ${deviceId} in lab ${labId}` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  
+  }
+ 
+}
+exports.getagentidsbylabid=async(req,res)=>{
+  try{
+    const {labId}=req.body;
+
+  }
+  catch(err){
+
+  }
+}

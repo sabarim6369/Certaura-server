@@ -2,7 +2,6 @@ const express = require('express');
 const dotenv = require('dotenv');
 const http = require('http');
 const WebSocket = require('ws');
-
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const LabRoutes = require("./routes/labRoutes");
@@ -14,7 +13,6 @@ require("./cron/Autostartjob")
 const cors=require("cors");
 dotenv.config();
 connectDB();
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -84,21 +82,41 @@ wss.on('connection', (ws) => {
 
 
 
-app.post('/start-exam/:labId/:deviceId', (req, res) => {
-  const { labId, deviceId } = req.params;
+// app.post('/start-exam/:labId/:deviceId', (req, res) => {
+//   const { labId, deviceId } = req.params;
+//   const { url } = req.body;
+
+//   if (
+//     agentsByLab[labId] &&
+//     agentsByLab[labId][deviceId] &&
+//     agentsByLab[labId][deviceId].readyState === WebSocket.OPEN
+//   ) {
+//     agentsByLab[labId][deviceId].send(JSON.stringify({ type: 'START_EXAM', url }));
+//     return res.json({ success: true, message: `Started exam on device ${deviceId}` });
+//   } else {
+//     return res.status(404).json({ success: false, message: 'Agent not connected' });
+//   }
+// });
+app.post('/restart-exam/:labId', (req, res) => {
+  const { labId } = req.params;
   const { url } = req.body;
 
-  if (
-    agentsByLab[labId] &&
-    agentsByLab[labId][deviceId] &&
-    agentsByLab[labId][deviceId].readyState === WebSocket.OPEN
-  ) {
-    agentsByLab[labId][deviceId].send(JSON.stringify({ type: 'START_EXAM', url }));
-    return res.json({ success: true, message: `Started exam on device ${deviceId}` });
+  if (agentsByLab[labId]) {
+    const payload = JSON.stringify({ type: 'RESTART_OFFED_COMPUTER_EXAM', url });
+
+    Object.values(agentsByLab[labId]).forEach((agent) => {
+      if (agent.readyState === WebSocket.OPEN) {
+        agent.send(payload);
+      }
+    });
+
+    return res.json({ success: true, message: `Restart signal sent to lab ${labId}` });
   } else {
-    return res.status(404).json({ success: false, message: 'Agent not connected' });
+    return res.status(404).json({ success: false, message: 'No agents connected for this lab' });
   }
 });
+
+
 // app.post('/stop-exam/:labId/:deviceId', (req, res) => {
 //   const { labId, deviceId } = req.params;
 

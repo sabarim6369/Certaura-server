@@ -14,8 +14,17 @@ function sendCommandToLab(labId, command) {
     });
   }
 }
-
+function sendCommandToAgent(labId, deviceId, command) {
+  if (agentsByLab[labId] && agentsByLab[labId][deviceId]) {
+    const ws = agentsByLab[labId][deviceId];
+    if (ws.readyState === ws.OPEN) {
+      ws.send(JSON.stringify(command));
+    }
+  }
+}
 module.exports = {
   setAgentsByLabMap,
   sendCommandToLab,
+    sendCommandToAgent
+
 };

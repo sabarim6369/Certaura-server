@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const examSchema = new Schema({
-      name: { type: String, required: true, trim: true },  
+  name: { type: String, required: true, trim: true },  
   url: { type: String, required: true, trim: true },
   status: { type: String, default: "Stopped" },
   autoMode: { type: Boolean, default: false },

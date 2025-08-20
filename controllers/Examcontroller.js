@@ -66,6 +66,7 @@ exports.updateExam = async (req, res) => {
       if (req.body.status === "Running" || req.body.status === "Started") {
         sendCommandToLab(labId, { type: "START_EXAM", url: updatedExam.url });
       } else if (req.body.status === "Stopped") {
+        // Send STOP_EXAM command to all agents in this lab
         sendCommandToLab(labId, { type: "STOP_EXAM" });
       }
     }
